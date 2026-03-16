@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: steam-gateway
+
+server:
+  port: 8080
+
+# lis-skins.com: экспорт цен CS2 (ответ api_csgo_full.json отдаётся сервису items без БД)
+lis-skins:
+  export-url: https://lis-skins.com/market_export_json/api_csgo_full.json
+  connect-timeout-ms: 5000
+  read-timeout-ms: 30000
+  max-retries: 3
+  # max-in-memory-size-bytes: 1073741824  # по умолчанию 1 GB
+
+# CSFloat Inspect API (https://github.com/csfloat/inspect) — float, paint seed по inspect-ссылке
+# Включите и укажите base-url своего инстанса. Если в конфиге бота задан bulk_key — укажите тот же bulk-key здесь.
+csfloat:
+  inspect:
+    enabled: true
+    base-url: "http://localhost:80"
+    connect-timeout-ms: 5000
+    read-timeout-ms: 30000
+    bulk-max-links: 50
+    # bulk-key: ""   # задайте, если в config.js бота указан bulk_key
+
+# Steam Community API (без API-ключа; инвентарь должен быть публичным)
+steam:
+  client:
+    base-url: https://steamcommunity.com
+    inventory-path-template: /inventory/{steamId}/{appId}/{contextId}
+    market-search-path-template: /market/search/render/?norender=1&appid=730&currency=1&count={count}&start={start}
+    market-listing-app-id: 730  # CS2 — для /market/listings/{appId}/{marketHashName}/render/
+    connect-timeout-ms: 5000
+    read-timeout-ms: 15000
+
+# Observability
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Логи: структурированные (JSON опционально через logback-json)
+logging:
+  level:
+    root: INFO
+    com.skinsshowcase: DEBUG
+    org.springframework.web: INFO
+
+# Resilience4j: retry для вызовов Steam (опционально, можно включить на SteamClient)
+resilience4j:
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 1s
+        retry-exceptions:
+          - org.springframework.web.reactive.function.client.WebClientException
+    instances:
+      steamClient:
+        base-config: default
+        wait-duration: 2s
+
+# OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true

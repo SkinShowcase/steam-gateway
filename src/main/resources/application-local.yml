@@ -1,0 +1,5 @@
+# Локальный профиль (steam-gateway без БД — только прокси к lis-skins и Steam API)
+spring:
+  h2:
+    console:
+      enabled: false

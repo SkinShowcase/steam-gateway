@@ -1,0 +1,10 @@
+# Профиль docker: порт 8080 для healthcheck и работы за gateway
+server:
+  port: 8080
+
+# CSFloat Inspect: в Docker значения задаются через env (CSFLOAT_INSPECT_ENABLED, CSFLOAT_INSPECT_BASE_URL);
+# явные дефолты, чтобы бин csFloatWebClient создавался при enabled=true
+csfloat:
+  inspect:
+    enabled: true
+    base-url: "http://csfloat:80"
