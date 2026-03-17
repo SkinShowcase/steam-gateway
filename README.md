@@ -154,15 +154,6 @@ GET /api/v1/market/cs2/items
 
 Ключи в `application.yml` (или переменные окружения):
 
-**lis-skins (источник цен CS2 для sync)**
-
-| Свойство | По умолчанию | Описание |
-|----------|--------------|----------|
-| `lis-skins.export-url` | https://lis-skins.com/market_export_json/api_csgo_full.json | URL экспорта CS2 |
-| `lis-skins.connect-timeout-ms` | 5000 | Таймаут подключения (мс) |
-| `lis-skins.read-timeout-ms` | 30000 | Таймаут чтения (мс) |
-| `lis-skins.max-retries` | 3 | Повторы при 5xx/таймауте (backoff 2s) |
-
 **Steam Client**
 
 | Свойство | По умолчанию | Описание |
