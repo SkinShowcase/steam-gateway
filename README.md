@@ -86,6 +86,8 @@ curl -s "http://localhost:8080/api/v1/inventory/76561198000000000"
 - **floatValue, paintSeed и т.д. = null** — обогащение через CSFloat Inspect включается при `csfloat.inspect.enabled=true`. Бот понимает только **legacy**-формат inspect-ссылки (`steam://rungame/730/.../S...A...D...`), см. [csfloat/inspect API](https://github.com/csfloat/inspect#api). Ссылки **CS2** (`steam://run/730/...`, сериализованный hex или заглушка `%propid:6%`) не отправляются в бот; для таких предметов float остаётся null до поддержки нового формата в боте.
 - **Формат полей скина** — при успешном ответе бота ответ API по каждому предмету приведён к [формату Reply csfloat/inspect](https://github.com/csfloat/inspect#reply): `floatValue`, `paintSeed`, `paintIndex`, `wearName`, `fullItemName`, `weaponType`, `rarityName`, `qualityName`, `originName`, `minWear`, `maxWear`, `customName`, `killeaterValue`, `defIndex`, `stickers` (slot, stickerId, name, wear).
 
+Возможность использования csfloat была отключена, так как было найдено решение внутри платформы steam.
+
 ---
 
 ### 2. CS2 Market — синхронизация и список предметов
