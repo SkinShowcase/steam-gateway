@@ -232,7 +232,7 @@ GET /api/v1/market/cs2/items
      - **User Name:** `sa`
      - **Password:** пусто
   4. Нажмите Connect, затем выполните SQL: `SELECT * FROM market_item;`
-- **Важно:** таблица `market_item` будет **пустой**, пока вы не вызвали синхронизацию с lis-skins: `POST http://localhost:8080/api/v1/market/cs2/sync`.
+- **Важно:** таблица `market_item` будет **пустой**, пока вы не вызвали синхронизацию с steam: `POST http://localhost:8080/api/v1/market/cs2/sync`.
 
 **Вариант 2: Запуск с профилем `local` (PostgreSQL)**
 
@@ -245,29 +245,29 @@ GET /api/v1/market/cs2/items
   - **DBeaver / pgAdmin:** новое подключение PostgreSQL (localhost:5432, база `postgres`, пользователь `postgres`, ваш пароль), затем схема `public`, таблица `market_item`.
 - Таблица снова будет пустой, пока не выполнен `POST /api/v1/market/cs2/sync`.
 
-**Кратко:** H2 — смотрите файл в `data/steamgateway.mv.db` и веб-консоль `/h2-console`; PostgreSQL — подключайтесь к localhost:5432 клиентом (IntelliJ, DBeaver, pgAdmin). В обоих случаях данные появятся только после вызова синхронизации с lis-skins.
+**Кратко:** H2 — смотрите файл в `data/steamgateway.mv.db` и веб-консоль `/h2-console`; PostgreSQL — подключайтесь к localhost:5432 клиентом (IntelliJ, DBeaver, pgAdmin). В обоих случаях данные появятся только после вызова синхронизации с steam.
 
-Секреты и API-ключи для инвентаря (Steam) и цен (lis-skins) не используются — публичные эндпоинты.
+Секреты и API-ключи для инвентаря и цен не используются — публичные эндпоинты.
 
 ## Структура проекта
 
 ```
 com.skinsshowcase.steamgateway
 ├── SteamGatewayApplication.java
-├── client/           # SteamClient, SteamClientProperties; LisSkinsClient — изоляция вызовов Steam и lis-skins
-├── config/           # SteamWebClientConfig, LisSkinsWebClientConfig, MarketProperties, LisSkinsProperties, AsyncConfig
+├── client/           # SteamClient, SteamClientProperties; — изоляция вызовов Steam
+├── config/           # SteamWebClientConfig, MarketProperties, AsyncConfig
 ├── controller/       # InventoryController, MarketController
-├── dto/              # Steam* DTO, Inventory* DTO, LisSkinsExportDto, LisSkinsItemDto, MarketItemResponseDto
+├── dto/              # Steam* DTO, Inventory* DTO, MarketItemResponseDto
 ├── entity/           # MarketItem (JPA)
 ├── exception/        # SteamApiException, InvalidSteamIdException, GlobalExceptionHandler
 ├── repository/       # MarketItemRepository
-└── service/          # InventoryService, MarketService (sync CS2 с lis-skins, асинхронная джоба)
+└── service/          # InventoryService, MarketService (sync CS2, асинхронная джоба)
 ```
 
 ## Надёжность и безопасность
 
-- **Retry:** Resilience4j retry для Steam WebClient; для lis-skins — retry с backoff в `LisSkinsClient` (`lis-skins.max-retries`).
-- **Таймауты:** connect/read для Steam в `steam.client.*`, для lis-skins в `lis-skins.*`.
+- **Retry:** Resilience4j retry для Steam WebClient; для steam — retry с backoff.
+- **Таймауты:** connect/read для Steam в `steam.client.*`.
 - **Асинхронный sync:** джоба синхронизации CS2 выполняется в отдельном executor (`AsyncConfig`); повторный вызов во время выполнения не стартует новую джобу.
 - **Валидация:** SteamID64 по паттерну; некорректные данные → 400 и Problem Detail.
 - **Секреты:** только через env/config, не логируются.
