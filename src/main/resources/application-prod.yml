@@ -1,0 +1,5 @@
+# Профиль prod (steam-gateway без БД)
+spring:
+  h2:
+    console:
+      enabled: false

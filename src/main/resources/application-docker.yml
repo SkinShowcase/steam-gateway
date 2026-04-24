@@ -1,0 +1,31 @@
+# Профиль docker: порт 8080 для healthcheck и работы за gateway
+server:
+  port: 8080
+
+spring:
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+
+steam-gateway:
+  cache:
+    redis-enabled: true
+  internal:
+    cache-evict-token: ${STEAM_GATEWAY_CACHE_EVICT_TOKEN:}
+
+# Каталог items в Docker-сети (не localhost хоста)
+items-catalog:
+  base-url: ${ITEMS_CATALOG_BASE_URL:http://items:8080}
+
+auth-service:
+  base-url: ${AUTH_SERVICE_BASE_URL:http://auth:8080}
+  connect-timeout-ms: 3000
+  read-timeout-ms: 10000
+  internal-service-key: ${AUTH_INTERNAL_SERVICE_KEY:}
+
+# CSFloat Inspect: в Docker — через env CSFLOAT_INSPECT_ENABLED / CSFLOAT_INSPECT_BASE_URL (сервис csfloat в compose опционален).
+csfloat:
+  inspect:
+    enabled: ${CSFLOAT_INSPECT_ENABLED:false}
+    base-url: ${CSFLOAT_INSPECT_BASE_URL:http://csfloat:80}

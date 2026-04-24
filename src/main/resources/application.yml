@@ -1,0 +1,108 @@
+spring:
+  application:
+    name: steam-gateway
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+
+server:
+  port: 8080
+
+steam-gateway:
+  cache:
+    redis-enabled: ${STEAM_GATEWAY_CACHE_REDIS_ENABLED:true}
+  internal:
+    cache-evict-token: ${STEAM_GATEWAY_CACHE_EVICT_TOKEN:}
+
+steam:
+  web-api:
+    base-url: ${STEAM_WEB_API_BASE_URL:https://api.steampowered.com}
+    key: ${STEAM_API_KEY:}
+  # Steam Community API (без API-ключа; инвентарь должен быть публичным)
+  client:
+    base-url: ${STEAM_COMMUNITY_BASE_URL:https://steamcommunity.com}
+    inventory-path-template: /inventory/{steamId}/{appId}/{contextId}
+    market-search-path-template: /market/search/render/?norender=1&appid=730&currency=1&count={count}&start={start}
+    market-listing-app-id: 730  # CS2 — для /market/listings/{appId}/{marketHashName}/render/
+    connect-timeout-ms: 5000
+    read-timeout-ms: 15000
+
+# lis-skins.com: экспорт цен CS2 (ответ api_csgo_full.json отдаётся сервису items без БД)
+lis-skins:
+  export-url: https://lis-skins.com/market_export_json/api_csgo_full.json
+  connect-timeout-ms: 5000
+  read-timeout-ms: 30000
+  max-retries: 3
+  max-in-memory-size-bytes: ${LIS_SKINS_MAX_IN_MEMORY_BYTES:1073741824}
+
+# CSFloat Inspect API (https://github.com/csfloat/inspect) — float, paint seed по inspect-ссылке
+# Включите и укажите base-url своего инстанса. Если в конфиге бота задан bulk_key — укажите тот же bulk-key здесь.
+csfloat:
+  inspect:
+    enabled: true
+    base-url: "http://localhost:80"
+    connect-timeout-ms: 5000
+    read-timeout-ms: 30000
+    bulk-max-links: 50
+    bulk-key: ${CSFLOAT_BULK_KEY:}
+
+# Сервис items: каталог цен по classid (GET /api/v1/items/{itemId})
+items-catalog:
+  # Локально совпадает с SERVER_PORT сервиса items (8081). В Docker — профиль docker или ITEMS_CATALOG_BASE_URL.
+  base-url: ${ITEMS_CATALOG_BASE_URL:http://localhost:8081}
+  connect-timeout-ms: 3000
+  read-timeout-ms: 10000
+
+# Сервис auth: внутренний API profile-labels (отображаемое имя для personaName в инвентаре). Тот же ключ, что auth.internal.service-key.
+auth-service:
+  base-url: ${AUTH_SERVICE_BASE_URL:http://localhost:8081}
+  connect-timeout-ms: 3000
+  read-timeout-ms: 10000
+  internal-service-key: ${AUTH_INTERNAL_SERVICE_KEY:}
+
+# Observability
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[steam.gateway.outbound.duration]": true
+    export:
+      prometheus:
+        enabled: true
+
+# Логи: структурированные (JSON опционально через logback-json)
+logging:
+  level:
+    root: INFO
+    com.skinsshowcase: DEBUG
+    org.springframework.web: INFO
+
+# Resilience4j: retry для вызовов Steam (опционально, можно включить на SteamClient)
+resilience4j:
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 1s
+        retry-exceptions:
+          - org.springframework.web.reactive.function.client.WebClientException
+    instances:
+      steamClient:
+        base-config: default
+        wait-duration: 2s
+
+# OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
