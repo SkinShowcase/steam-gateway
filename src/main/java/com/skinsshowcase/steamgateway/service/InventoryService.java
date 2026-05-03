@@ -118,7 +118,7 @@ public class InventoryService {
             items.add(mapItem(asset, desc, props));
         }
 
-        log.debug("Mapped {} items for steamId={}, appId={}, contextId={}", items.size(), steamId, appId, contextId);
+        log.debug("Mapped {} items (appId={}, contextId={})", items.size(), appId, contextId);
         return InventoryResponseDto.builder()
                 .steamId(steamId)
                 .appId(appId)
