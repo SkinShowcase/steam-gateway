@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 /**
  * Сервис инвентаря: запрос к Steam, маппинг в DTO API.
- * Float, pattern, коллекция и износ берутся из ответа Steam (asset_properties, descriptions, tags).
+     * Float, pattern, коллекция и износ берутся из ответа Steam (asset_properties, descriptions, tags), без внешних inspect-сервисов.
  */
 @Slf4j
 @Service
@@ -43,7 +43,7 @@ public class InventoryService {
 
     /**
      * Получить список предметов в инвентаре по Steam ID.
-     * Float, pattern и коллекция извлекаются из JSON ответа Steam (без обращения к CSFloat).
+     * Float, pattern и коллекция извлекаются из JSON ответа Steam.
      *
      * @param steamId   SteamID64
      * @param appId     App ID (730 — CS2)

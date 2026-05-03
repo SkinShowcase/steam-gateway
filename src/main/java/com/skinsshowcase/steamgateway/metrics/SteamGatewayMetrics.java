@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
 
 /**
- * Метрики для Grafana: инвентарь, каталог цен, исходящие HTTP к Steam / items / lis-skins / CSFloat.
+ * Метрики для Grafana: инвентарь, каталог цен, исходящие HTTP к Steam / items / lis-skins / auth.
  */
 @Component
 public class SteamGatewayMetrics {

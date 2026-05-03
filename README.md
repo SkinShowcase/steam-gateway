@@ -8,8 +8,6 @@
 - **Публичные подписи в инвентаре**: запросы к `auth` для display name (`auth-service.*` + `AUTH_INTERNAL_SERVICE_KEY`).
 - **Кеширование**: Redis (см. `steam-gateway.cache.redis-enabled`, Spring Data Redis).
 
-Опционально: **CSFloat Inspect** клиент (float/paint seed) — включается конфигом `csfloat.inspect.*`. В репозитории инфраструктуры отдельный `csfloat` сервис **не обязателен**: можно поднять свой инстанс API и указать `base-url`.
-
 Репозиторий: https://github.com/SkinShowcase/steam-gateway  
 Инфраструктура (compose): https://github.com/SkinShowcase/infrastructure
 
@@ -60,7 +58,6 @@
 | `STEAM_GATEWAY_CACHE_EVICT_TOKEN` | Токен для `POST /internal/v1/cache/evict` |
 | `ITEMS_CATALOG_BASE_URL` | URL сервиса `items` |
 | `AUTH_SERVICE_BASE_URL` + `AUTH_INTERNAL_SERVICE_KEY` | Доступ к internal API `auth` |
-| `CSFLOAT_INSPECT_ENABLED`, `CSFLOAT_INSPECT_BASE_URL`, `CSFLOAT_BULK_KEY` | Опционально, если используете CSFloat Inspect |
 
 ## Наблюдаемость
 

@@ -6,8 +6,7 @@ import lombok.Value;
 import java.util.regex.Pattern;
 
 /**
- * Параметры из inspect-ссылки для запроса GET / CSFloat API (s, a, d, m).
- * См. https://github.com/csfloat/inspect — GET / с параметрами s, a, d, m.
+ * Параметры из Steam inspect-ссылки (s, a, d, m) для внешних запросов по предпросмотру предмета.
  */
 @Value
 @Builder

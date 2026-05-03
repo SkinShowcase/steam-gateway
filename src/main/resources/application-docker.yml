@@ -23,9 +23,3 @@ auth-service:
   connect-timeout-ms: 3000
   read-timeout-ms: 10000
   internal-service-key: ${AUTH_INTERNAL_SERVICE_KEY:}
-
-# CSFloat Inspect: в Docker — через env CSFLOAT_INSPECT_ENABLED / CSFLOAT_INSPECT_BASE_URL (сервис csfloat в compose опционален).
-csfloat:
-  inspect:
-    enabled: ${CSFLOAT_INSPECT_ENABLED:false}
-    base-url: ${CSFLOAT_INSPECT_BASE_URL:http://csfloat:80}

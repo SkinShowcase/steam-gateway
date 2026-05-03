@@ -45,7 +45,7 @@ public class InventoryItemResponseDto {
     @Schema(description = "URL иконки")
     private String iconUrl;
 
-    @Schema(description = "Inspect-ссылка для запроса float/pattern (CSFloat Inspect API и др.)")
+    @Schema(description = "Steam inspect-ссылка для предпросмотра предмета (float/pattern при необходимости запрашиваются отдельно)")
     private String inspectLink;
 
     // --- Атрибуты скина (CS2 и др.) ---

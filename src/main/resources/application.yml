@@ -36,17 +36,6 @@ lis-skins:
   max-retries: 3
   max-in-memory-size-bytes: ${LIS_SKINS_MAX_IN_MEMORY_BYTES:1073741824}
 
-# CSFloat Inspect API (https://github.com/csfloat/inspect) — float, paint seed по inspect-ссылке
-# Включите и укажите base-url своего инстанса. Если в конфиге бота задан bulk_key — укажите тот же bulk-key здесь.
-csfloat:
-  inspect:
-    enabled: true
-    base-url: "http://localhost:80"
-    connect-timeout-ms: 5000
-    read-timeout-ms: 30000
-    bulk-max-links: 50
-    bulk-key: ${CSFLOAT_BULK_KEY:}
-
 # Сервис items: каталог цен по classid (GET /api/v1/items/{itemId})
 items-catalog:
   # Локально совпадает с SERVER_PORT сервиса items (8081). В Docker — профиль docker или ITEMS_CATALOG_BASE_URL.
