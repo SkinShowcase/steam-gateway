@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Клиент к CSFloat Inspect API (https://github.com/csfloat/inspect).
@@ -141,17 +141,11 @@ public class CsFloatInspectClient {
         if (paramsList == null || paramsList.isEmpty()) {
             return Mono.just(Map.of());
         }
-        var result = new ConcurrentHashMap<String, CsFloatItemInfoDto>();
-        var monos = new ArrayList<Mono<Void>>();
-        for (var p : paramsList) {
-            if (p.getA() != null && p.getD() != null) {
-                monos.add(getByParams(p).doOnNext(info -> putIfValid(result, p.getA(), info)).then());
-            }
-        }
-        if (monos.isEmpty()) {
-            return Mono.just(Map.of());
-        }
-        return Mono.when(monos).thenReturn(Map.copyOf(result));
+        return Flux.fromIterable(paramsList)
+                .filter(p -> p.getA() != null && p.getD() != null)
+                .flatMap(p -> getByParams(p).map(info -> Map.entry(p.getA(), info)))
+                .filter(e -> isValidMapEntry(e.getKey(), e.getValue()))
+                .collectMap(Map.Entry::getKey, Map.Entry::getValue, LinkedHashMap::new);
     }
 
     /**
@@ -161,27 +155,20 @@ public class CsFloatInspectClient {
         if (inspectLinks == null || inspectLinks.isEmpty()) {
             return Mono.just(Map.of());
         }
-        var result = new ConcurrentHashMap<String, CsFloatItemInfoDto>();
-        var monos = new ArrayList<Mono<Void>>();
-        for (var link : inspectLinks) {
-            var p = InspectLinkParams.fromInspectLink(link);
-            if (p != null) {
-                monos.add(getByParams(p).doOnNext(info -> putIfValid(result, p.getA(), info)).then());
-            } else {
-                monos.add(getByUrl(link).doOnNext(info -> putIfValid(result, csFloatKey(info), info)).then());
-            }
-        }
-        if (monos.isEmpty()) {
-            return Mono.just(Map.of());
-        }
-        return Mono.when(monos).thenReturn(Map.copyOf(result));
+        return Flux.fromIterable(inspectLinks)
+                .flatMap(link -> {
+                    var p = InspectLinkParams.fromInspectLink(link);
+                    if (p != null) {
+                        return getByParams(p).map(info -> Map.entry(p.getA(), info));
+                    }
+                    return getByUrl(link).map(info -> Map.entry(csFloatKey(info), info));
+                })
+                .filter(e -> isValidMapEntry(e.getKey(), e.getValue()))
+                .collectMap(Map.Entry::getKey, Map.Entry::getValue, LinkedHashMap::new);
     }
 
-    private static void putIfValid(ConcurrentHashMap<String, CsFloatItemInfoDto> result, String key, CsFloatItemInfoDto info) {
-        if (info == null || info.getError() != null || key == null || key.isBlank()) {
-            return;
-        }
-        result.put(key, info);
+    private static boolean isValidMapEntry(String key, CsFloatItemInfoDto info) {
+        return info != null && info.getError() == null && key != null && !key.isBlank();
     }
 
     private static String csFloatKey(CsFloatItemInfoDto info) {

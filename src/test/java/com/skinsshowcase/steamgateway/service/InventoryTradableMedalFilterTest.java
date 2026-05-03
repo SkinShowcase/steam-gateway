@@ -1,41 +1,52 @@
 package com.skinsshowcase.steamgateway.service;
 
 import com.skinsshowcase.steamgateway.dto.SteamDescriptionDto;
+import com.skinsshowcase.steamgateway.dto.SteamTagDto;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class InventoryTradableMedalFilterTest {
 
     @Test
-    void excludesNullDescription() {
-        assertFalse(InventoryTradableMedalFilter.isInventoryItemIncluded(null));
+    void nullDescription_excluded() {
+        assertThat(InventoryTradableMedalFilter.isInventoryItemIncluded(null)).isFalse();
     }
 
     @Test
-    void excludesNonTradable() {
+    void notTradable_excluded() {
         var d = new SteamDescriptionDto();
         d.setTradable(0);
-        d.setType("Rifle");
-        assertFalse(InventoryTradableMedalFilter.isInventoryItemIncluded(d));
+        assertThat(InventoryTradableMedalFilter.isInventoryItemIncluded(d)).isFalse();
     }
 
     @Test
-    void includesTradableSkin() {
+    void tradableRifle_included() {
         var d = new SteamDescriptionDto();
         d.setTradable(1);
         d.setType("Rifle");
-        d.setName("AK-47 | Redline (Field-Tested)");
-        assertTrue(InventoryTradableMedalFilter.isInventoryItemIncluded(d));
+        d.setName("AK-47 | Redline");
+        assertThat(InventoryTradableMedalFilter.isInventoryItemIncluded(d)).isTrue();
     }
 
     @Test
-    void excludesServiceMedal() {
+    void tradableServiceMedal_excluded() {
         var d = new SteamDescriptionDto();
         d.setTradable(1);
-        d.setType("Extraordinary");
-        d.setName("Service Medal 2023");
-        assertFalse(InventoryTradableMedalFilter.isInventoryItemIncluded(d));
+        d.setType("Collectible — Service Medal 2024");
+        assertThat(InventoryTradableMedalFilter.isInventoryItemIncluded(d)).isFalse();
+    }
+
+    @Test
+    void tradableMedalViaTag_excluded() {
+        var d = new SteamDescriptionDto();
+        d.setTradable(1);
+        d.setName("Something");
+        var tag = new SteamTagDto();
+        tag.setInternalName("collectible_medal_2020");
+        d.setTags(List.of(tag));
+        assertThat(InventoryTradableMedalFilter.isInventoryItemIncluded(d)).isFalse();
     }
 }
